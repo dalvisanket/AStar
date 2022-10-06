@@ -127,22 +127,4 @@ public class A_Star {
     }
 
 
-    public static void displayPath(List<Node> path,String[][] matrix){
-        for(Node node : path){
-            int i = node.position[0];
-            int j = node.position[1];
-            matrix[i][j] = "*";
-        }
-        displayMatrix(matrix);
-    }
-
-    public static void displayMatrix(String[][] matrix){
-        for(String[] row : matrix){
-            for(String n : row){
-                System.out.print(n + " ");
-            }
-            System.out.println();
-        }
-    }
-
 }
