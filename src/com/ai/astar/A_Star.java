@@ -1,7 +1,7 @@
 package com.ai.astar;
 
 import com.ai.astar.domain.Node;
-import com.ai.astar.util.OpenListComparator;
+import com.ai.astar.util.Heap;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -20,11 +20,11 @@ public class A_Star {
         //Initialize Closed list
         List<int[]> closedList = new ArrayList<>();
 
-        //Initialize the Priority queue of Path Obj
-        List<Node> openList = new ArrayList<>();
+        //Initialize the Custom Heap Node Obj
+        Heap openList = new Heap();
 
         //Offer the start position to Priority Queue
-        openList.add(new Node(start,
+        openList.insert(new Node(start,
                 gn,
                 hn,
                 gn+hn,
@@ -38,8 +38,8 @@ public class A_Star {
         while(!openList.isEmpty()){
 
             //Poll the top priority element from the queue
-            Node currHead = openList.get(0);
-            openList.remove(0);
+            Node currHead = openList.poll();
+
             if(!checkIfInClosedList(currHead.position,closedList)) closedList.add(currHead.position);
 
             //Visit all possible direction
@@ -61,9 +61,9 @@ public class A_Star {
                     int localFn = localGn + localHn;
 
                     //Check if the node is on the open list and fn is greater than new fn
-                    if(checkIfNodeInOpenList(new int[]{x,y},openList)){
+                    if(checkIfNodeInOpenList(new int[]{x,y},openList.nodeHeap)){
                         Node openNode = null;
-                        for(Node visited: openList){
+                        for(Node visited: openList.nodeHeap){
                             if(visited.position[0] == x && visited.position[1] == y) {
                                 openNode = visited;
                                 break;
@@ -72,7 +72,7 @@ public class A_Star {
                        if(openNode.fn > localFn){
                            openNode.fn = localFn;
                            openNode.head = currHead;
-                           openList.sort(new OpenListComparator());
+                           openList.sort();
                        }
                        continue;
 
@@ -88,8 +88,7 @@ public class A_Star {
                         return preparePath(newNode);
                     }
 
-                    openList.add(newNode);
-                    openList.sort(new OpenListComparator());
+                    openList.insert(newNode);
 
                 }
             }
