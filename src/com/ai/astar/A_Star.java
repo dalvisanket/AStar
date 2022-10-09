@@ -2,6 +2,7 @@ package com.ai.astar;
 
 import com.ai.astar.domain.Node;
 import com.ai.astar.util.Heap;
+import com.ai.astar.util.MatrixUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,6 +11,29 @@ import java.util.List;
 
 
 public class A_Star {
+
+    public static List<Node> repeatedAStar(String[][] matrix,String[][] memMat, int[] start, int[] end){
+        //Save full path
+        List<Node> fullPath = new LinkedList<>();
+
+        //Stopping condition for Repeated A*
+        while(start[0] != end[0] || start[1] != end[1]) {
+            List<Node> path = A_Star.findpath(memMat, start, end);
+            if(path == null ) {
+                System.out.println("********************************** NO POSSIBLE PATH **********************************");
+                return null;
+            }
+            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX **********************************");
+            MatrixUtil.displayTempPath(path, memMat);
+
+            int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
+            fullPath.addAll(path.subList(0,newStartIndex+1));
+
+            int[] newStart = path.get(newStartIndex).position;
+            start = newStart;
+        }
+        return fullPath;
+    }
 
     public static List<Node> findpath(String[][] matrix, int[] start, int[] end){
 

@@ -3,7 +3,6 @@ package com.ai.astar.util;
 import com.ai.astar.domain.Node;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Heap {
