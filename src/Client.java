@@ -10,7 +10,7 @@ public class Client {
 
         //Check for forward or backward A*
         boolean isFwd = true;
-        if(args.length != 0 && args[0].equals("backward") ){
+        if(args.length != 0 && args[0].equalsIgnoreCase("backward")){
             isFwd = false;
         }
 
@@ -62,13 +62,6 @@ public class Client {
             }
             MatrixUtil.displayPath(fullPath, memMat);
         }
-        //TO DO
-        //Save full path
-        //alter heap logic to break tie by less gn and greater gn
-        //implemnet path inversion logic for backward a*
-
-
-
 
     }
 
