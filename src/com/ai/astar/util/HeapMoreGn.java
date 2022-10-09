@@ -5,11 +5,11 @@ import com.ai.astar.domain.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Heap {
+public class HeapMoreGn {
 
     public List<Node> nodeHeap;
 
-    public Heap(){
+    public HeapMoreGn(){
         this.nodeHeap = new ArrayList<>();
     }
 
