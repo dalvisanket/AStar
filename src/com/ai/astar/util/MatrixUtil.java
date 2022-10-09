@@ -2,9 +2,31 @@ package com.ai.astar.util;
 
 import com.ai.astar.domain.Node;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MatrixUtil {
+
+    public static String[][] initializeMemoryMatrix(String[][] matrix){
+        String[][] memMat = new String[matrix.length][matrix[0].length];
+
+        for(int i = 0; i < matrix.length; i ++){
+            for(int j = 0;j < matrix[0].length; j++){
+                memMat[i][j] = ".";
+            }
+        }
+        return memMat;
+    }
+
+    public static List<Node> invertPath(List<Node> path){
+
+        List<Node> invertedPath = new LinkedList<>();
+        for (int i = 0; i < path.size(); i++){
+            invertedPath.add(path.get(path.size()-i-1));
+        }
+
+        return invertedPath;
+    }
 
     public static void displayPath(List<Node> path, String[][] matrix){
         String[][] temp = new String[matrix.length][matrix[0].length];
@@ -18,6 +40,30 @@ public class MatrixUtil {
             int j = node.position[1];
             temp[i][j] = "*";
         }
+        int[] start = path.get(0).position;
+        temp[start[0]][start[1]] = "S";
+
+        int[] end = path.get(path.size()-1).position;
+        temp[end[0]][end[1]] = "G";
+        displayMatrix(temp);
+    }
+    public static void displayTempPath(List<Node> path, String[][] matrix){
+        String[][] temp = new String[matrix.length][matrix[0].length];
+        for(int m = 0; m < matrix.length; m++){
+            for(int n = 0; n < matrix[0].length; n++){
+                temp[m][n] = matrix[m][n];
+            }
+        }
+        for(Node node : path){
+            int i = node.position[0];
+            int j = node.position[1];
+            temp[i][j] = "*";
+        }
+        int[] start = path.get(0).position;
+        temp[start[0]][start[1]] = "R";
+
+        int[] end = path.get(path.size()-1).position;
+        temp[end[0]][end[1]] = "G";
         displayMatrix(temp);
     }
 
@@ -31,19 +77,19 @@ public class MatrixUtil {
     }
 
 
-    public static Node followAStarPath(List<Node> path,String[][] matrix,String[][] memMat){
+    public static int followAStarPath(List<Node> path,String[][] matrix,String[][] memMat){
 
         for(int k = 0; k < path.size(); k++){
             int i = path.get(k).position[0];
             int j = path.get(k).position[1];
 
-            if(matrix[i][j].equals("#")) return path.get(k-1);
+            if(matrix[i][j].equals("#")) return k-1;
             else{
                 updateMemoryMatrix(matrix,memMat,i,j);
             }
         }
 
-        return path.get(path.size()-1);
+        return path.size()-1;
     }
 
     public static void updateMemoryMatrix(String[][] matrix,String[][] memMat,int i, int j){
