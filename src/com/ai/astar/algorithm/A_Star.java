@@ -1,4 +1,4 @@
-package com.ai.astar;
+package com.ai.astar.algorithm;
 
 import com.ai.astar.domain.Node;
 import com.ai.astar.util.Heap;
@@ -94,6 +94,8 @@ public class A_Star {
                             }
                         }
                        if(openNode.fn > localFn){
+                           openNode.gn =localGn;
+                           openNode.hn = localHn;
                            openNode.fn = localFn;
                            openNode.head = currHead;
                            openList.sort();

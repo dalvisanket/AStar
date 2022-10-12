@@ -26,20 +26,20 @@ public class MazeGenerator {
             }
         }
 
-        double startx = Math.random()*20;
+        double startx = Math.random()*(rows-1);
         int x = (int) startx;
 
-        double starty = Math.random()*20;
+        double starty = Math.random()*(columns-1);
         int y = (int) starty;
 
         this.start = new int[]{x,y};
         maze[start[0]][start[1]] = "S";
 
 
-        double endx = Math.random()*20;
+        double endx = Math.random()*(rows-1);
         x = (int) endx;
 
-        double endy = Math.random()*20;
+        double endy = Math.random()*(columns-1);
         y = (int) endy;
 
         this.end = new int[]{x,y};
