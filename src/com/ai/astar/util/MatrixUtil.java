@@ -40,12 +40,18 @@ public class MatrixUtil {
             int j = node.position[1];
             temp[i][j] = "*";
         }
-        int[] start = path.get(0).position;
-        temp[start[0]][start[1]] = "S";
+        try {
+            int[] start = path.get(0).position;
+            temp[start[0]][start[1]] = "S";
 
-        int[] end = path.get(path.size()-1).position;
-        temp[end[0]][end[1]] = "G";
-        displayMatrix(temp);
+            int[] end = path.get(path.size()-1).position;
+            temp[end[0]][end[1]] = "G";
+            displayMatrix(temp);
+        }
+        catch (Exception e){
+         System.out.println(e);
+        }
+
     }
     public static void displayTempPath(List<Node> path, String[][] matrix){
         String[][] temp = new String[matrix.length][matrix[0].length];
