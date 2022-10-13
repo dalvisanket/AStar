@@ -48,6 +48,35 @@ public class MatrixUtil {
         displayMatrix(temp);
     }
 
+    public static void displayTempPath(List<Node> path, String[][] matrix, int[] start, int[] end) {
+        String[][] temp = new String[matrix.length][matrix[0].length];
+        for(int m = 0; m < matrix.length; m++){
+            for(int n = 0; n < matrix[0].length; n++){
+                temp[m][n] = matrix[m][n];
+            }
+        }
+        for(Node node : path){
+            int i = node.position[0];
+            int j = node.position[1];
+            temp[i][j] = "*";
+        }
+        int[] robotStart = path.get(0).position;
+        if(robotStart[0] == start[0] && robotStart[1] == start[1]) temp[start[0]][start[1]] = "S/R";
+        else{
+            temp[start[0]][start[1]] = "S";
+            temp[robotStart[0]][robotStart[1]] = "Ro";
+        }
+
+        int[] robotEnd = path.get(path.size()-1).position;
+        if(robotEnd[0] == end[0] && robotEnd[1] == end[1]) temp[end[0]][end[1]] = "G/Rn";
+        else{
+            temp[end[0]][end[1]] = "G";
+            temp[robotEnd[0]][robotEnd[1]] = "Rn";
+        }
+
+        displayMatrix(temp);
+    }
+
     public static void displayMatrix(String[][] matrix){
         for(String[] row : matrix){
             for(String n : row){
@@ -57,6 +86,16 @@ public class MatrixUtil {
         }
     }
 
+    public static void displayMatrix(String[][] matrix,int[] start, int[] end){
+        matrix[start[0]][start[1]] = "S";
+        matrix[end[0]][end[1]] = "G";
+        for(String[] row : matrix){
+            for(String n : row){
+                System.out.print(n + " ");
+            }
+            System.out.println();
+        }
+    }
 
     public static int followAStarPath(List<Node> path,String[][] matrix,String[][] memMat){
 
@@ -86,32 +125,4 @@ public class MatrixUtil {
         }
     }
 
-    public static void displayTempPath(List<Node> path, String[][] matrix, int[] start, int[] end) {
-        String[][] temp = new String[matrix.length][matrix[0].length];
-        for(int m = 0; m < matrix.length; m++){
-            for(int n = 0; n < matrix[0].length; n++){
-                temp[m][n] = matrix[m][n];
-            }
-        }
-        for(Node node : path){
-            int i = node.position[0];
-            int j = node.position[1];
-            temp[i][j] = "*";
-        }
-        int[] robotStart = path.get(0).position;
-        if(robotStart[0] == start[0] && robotStart[1] == start[1]) temp[start[0]][start[1]] = "S/R";
-        else{
-            temp[start[0]][start[1]] = "S";
-            temp[robotStart[0]][robotStart[1]] = "Ro";
-        }
-
-        int[] robotEnd = path.get(path.size()-1).position;
-        if(robotEnd[0] == end[0] && robotEnd[1] == end[1]) temp[end[0]][end[1]] = "G/Rn";
-        else{
-            temp[end[0]][end[1]] = "G";
-            temp[robotEnd[0]][robotEnd[1]] = "Rn";
-        }
-
-        displayMatrix(temp);
-    }
 }
