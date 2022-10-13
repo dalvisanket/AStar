@@ -12,6 +12,8 @@ import java.util.List;
 
 public class A_Star {
 
+    private static int totalClosedNodes = 0;
+
     public static void repeatedAStar(String[][] matrix,String[][] memMat, int[] start, int[] end){
 
         System.out.println("START: " + start[0] + " : " + start[1]);
@@ -37,6 +39,10 @@ public class A_Star {
             int[] newStart = path.get(newStartIndex).position;
             start = newStart;
         }
+
+        System.out.println("Total Closed Nodes : " + totalClosedNodes);
+        //Resetting the closed nodes count to zero
+        totalClosedNodes = 0;
 
     }
 
@@ -68,6 +74,10 @@ public class A_Star {
             int[] newStart = path.get(newStartIndex).position;
             start = newStart;
         }
+
+        System.out.println("Total Closed Nodes : " + totalClosedNodes);
+        //Resetting the closed nodes count to zero
+        totalClosedNodes = 0;
     }
 
     public static List<Node> findpath(String[][] matrix, int[] start, int[] end){
@@ -77,7 +87,7 @@ public class A_Star {
         int hn = computeManhattan(start, end);
 
         //Initialize Closed list
-        List<int[]> closedList = new ArrayList<>();
+        List<Node> closedList = new ArrayList<>();
 
         //Initialize the Custom Heap Node Obj
         Heap openList = new Heap();
@@ -99,7 +109,7 @@ public class A_Star {
             //Poll the top priority element from the queue
             Node currHead = openList.poll();
 
-            if(!checkIfInClosedList(currHead.position,closedList)) closedList.add(currHead.position);
+            if(!checkIfNodeInList(currHead.position,closedList)) closedList.add(currHead);
 
             //Visit all possible direction
             for(int[] dir : dirs){
@@ -112,7 +122,7 @@ public class A_Star {
                 if(x>=0 && y>=0 && x<matrix.length && y<matrix[0].length && !matrix[x][y].equals("#")){
 
                     //Check if point already present in closed list
-                    if(checkIfInClosedList(new int[]{x,y},closedList)) continue;
+                    if(checkIfNodeInList(new int[]{x,y},closedList)) continue;
 
                     //Compute new Gn, Hn & Fn
                     int localGn = computeManhattan(new int[]{x,y},currHead.position) + currHead.gn;
@@ -120,7 +130,7 @@ public class A_Star {
                     int localFn = localGn + localHn;
 
                     //Check if the node is on the open list and fn is greater than new fn
-                    if(checkIfNodeInOpenList(new int[]{x,y},openList.nodeHeap)){
+                    if(checkIfNodeInList(new int[]{x,y},openList.nodeHeap)){
                         Node openNode = null;
                         for(Node visited: openList.nodeHeap){
                             if(visited.position[0] == x && visited.position[1] == y) {
@@ -146,6 +156,7 @@ public class A_Star {
 
                     //When target is reached
                     if(x == end[0] && y == end[1]){
+                        A_Star.totalClosedNodes += closedList.size();
                         return preparePath(newNode);
                     }
 
@@ -161,7 +172,7 @@ public class A_Star {
         return Math.abs(target[0]-point[0]) + Math.abs(target[1]-point[1]);
     }
 
-    private static boolean checkIfNodeInOpenList(int[] coord, List<Node> node){
+    private static boolean checkIfNodeInList(int[] coord, List<Node> node){
 
         for(Node visited: node){
             if(visited.position[0] == coord[0] && visited.position[1] == coord[1]) return true;
@@ -169,12 +180,6 @@ public class A_Star {
         return false;
     }
 
-    private static boolean checkIfInClosedList(int[] coord, List<int[]> closedList){
-        for(int[] visited: closedList){
-            if(visited[0] == coord[0] && visited[1] == coord[1]) return true;
-        }
-        return false;
-    }
 
     private static List<Node> preparePath(Node end){
 

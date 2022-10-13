@@ -8,41 +8,49 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class A_Star_Adaptive_Hn {
+public class Adaptive_A_Star {
 
-    public static List<Node> repeatedAStar(String[][] matrix, String[][] memMat, int[] start, int[] end){
-        //Save full path
-        List<Node> fullPath = new LinkedList<>();
+    private static int totalClosedNodes = 0;
+    public static void repeatedAStar(String[][] matrix, String[][] memMat, int[] start, int[] end){
+
+        List<Node> closedListPev = new ArrayList<>();
+
+        int[] initialStart = start;
 
         //Stopping condition for Repeated A*
         while(start[0] != end[0] || start[1] != end[1]) {
-            List<Node> path = A_Star.findpath(memMat, start, end);
+            List<Node> path = findpath(memMat, start, end, closedListPev);
+
             if(path == null ) {
                 System.out.println("********************************** NO POSSIBLE PATH **********************************");
-                return null;
+                System.exit(1);
             }
             System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX **********************************");
             MatrixUtil.displayTempPath(path, memMat);
 
             int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
-            fullPath.addAll(path.subList(0,newStartIndex+1));
+
+            System.out.println("********************************** FOLLOWING THE ASTAR PATH **********************************");
+            MatrixUtil.displayTempPath(path.subList(0,newStartIndex+1),memMat,initialStart,end);
 
             int[] newStart = path.get(newStartIndex).position;
             start = newStart;
         }
-        return fullPath;
+
+        System.out.println("Total Closed Nodes : " + totalClosedNodes);
+        //Resetting the closed nodes count to zero
+        totalClosedNodes = 0;
     }
 
-    public static List<Node> findpath(String[][] matrix, int[] start, int[] end){
+    public static List<Node> findpath(String[][] matrix, int[] start, int[] end, List<Node> closedListPev){
 
         //Compute Gn and Hn for the first position
         int gn = computeManhattan(start,start);
-        int gd_start = computeManhattan(start,end);
 
-        int hn = gd_start - gn;
+        int hn = getNode(closedListPev,start) != null ? getNode(closedListPev,start).hn : computeManhattan(start,end);
 
         //Initialize Closed list
-        List<int[]> closedList = new ArrayList<>();
+        List<Node> closedList = new ArrayList<>();
 
         //Initialize the Custom Heap Node Obj
         Heap openList = new Heap();
@@ -64,7 +72,12 @@ public class A_Star_Adaptive_Hn {
             //Poll the top priority element from the queue
             Node currHead = openList.poll();
 
-            if(!checkIfInClosedList(currHead.position,closedList)) closedList.add(currHead.position);
+            if(!checkIfNodeInList(currHead.position,closedList)) {
+                closedList.add(currHead);
+
+                //Remove currently from the all previous closed nodes to add the updated gn,hn,fn values later
+                closedListPev.remove(getNode(closedListPev,currHead.position));
+            }
 
             //Visit all possible direction
             for(int[] dir : dirs){
@@ -77,15 +90,19 @@ public class A_Star_Adaptive_Hn {
                 if(x>=0 && y>=0 && x<matrix.length && y<matrix[0].length && !matrix[x][y].equals("#")){
 
                     //Check if point already present in closed list
-                    if(checkIfInClosedList(new int[]{x,y},closedList)) continue;
+                    if(checkIfNodeInList(new int[]{x,y},closedList)) continue;
 
                     //Compute new Gn, Hn & Fn
                     int localGn = computeManhattan(new int[]{x,y},currHead.position) + currHead.gn;
-                    int localHn = gd_start - localGn;
+
+                    int localHn;
+                    if(checkIfNodeInList(new int[]{x,y},closedListPev)) localHn = getNode(closedListPev,new int[]{x,y}).hn;
+                    else localHn = computeManhattan(new int[]{x,y},end);
+
                     int localFn = localGn + localHn;
 
                     //Check if the node is on the open list and fn is greater than new fn
-                    if(checkIfNodeInOpenList(new int[]{x,y},openList.nodeHeap)){
+                    if(checkIfNodeInList(new int[]{x,y},openList.nodeHeap)){
                         Node openNode = null;
                         for(Node visited: openList.nodeHeap){
                             if(visited.position[0] == x && visited.position[1] == y) {
@@ -111,7 +128,10 @@ public class A_Star_Adaptive_Hn {
 
                     //When target is reached
                     if(x == end[0] && y == end[1]){
-                        return preparePath(newNode);
+                        Adaptive_A_Star.totalClosedNodes += closedList.size();
+                        List<Node> path = preparePath(newNode);
+                        updateNewHeuristics(closedList, closedListPev, path.size()-1);
+                        return path;
                     }
 
                     openList.insert(newNode);
@@ -122,21 +142,28 @@ public class A_Star_Adaptive_Hn {
         return null;
     }
 
+    private static void updateNewHeuristics(List<Node> closedList, List<Node> closedListPev, int g_path) {
+        for(Node node: closedList){
+            node.hn = g_path - node.gn;
+        }
+        closedListPev.addAll(closedList);
+    }
+
+    private static Node getNode(List<Node> list, int[] position) {
+
+        for(Node node: list){
+            if(node.position[0] == position[0] && node.position[1] == position[1]) return node;
+        }
+        return null;
+    }
+
     private static int computeManhattan(int[] point, int[] target){
         return Math.abs(target[0]-point[0]) + Math.abs(target[1]-point[1]);
     }
 
-    private static boolean checkIfNodeInOpenList(int[] coord, List<Node> node){
-
-        for(Node visited: node){
+    private static boolean checkIfNodeInList(int[] coord, List<Node> list){
+        for(Node visited: list){
             if(visited.position[0] == coord[0] && visited.position[1] == coord[1]) return true;
-        }
-        return false;
-    }
-
-    private static boolean checkIfInClosedList(int[] coord, List<int[]> closedList){
-        for(int[] visited: closedList){
-            if(visited[0] == coord[0] && visited[1] == coord[1]) return true;
         }
         return false;
     }
