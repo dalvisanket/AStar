@@ -12,27 +12,62 @@ import java.util.List;
 
 public class A_Star {
 
-    public static List<Node> repeatedAStar(String[][] matrix,String[][] memMat, int[] start, int[] end){
-        //Save full path
-        List<Node> fullPath = new LinkedList<>();
+    public static void repeatedAStar(String[][] matrix,String[][] memMat, int[] start, int[] end){
+
+        System.out.println("START: " + start[0] + " : " + start[1]);
+        System.out.println("END: " + end[0] + " : " + end[1]);
+
+        int[] initialStart = start;
 
         //Stopping condition for Repeated A*
         while(start[0] != end[0] || start[1] != end[1]) {
             List<Node> path = A_Star.findpath(memMat, start, end);
             if(path == null ) {
                 System.out.println("********************************** NO POSSIBLE PATH **********************************");
-                return null;
+                System.exit(1);
             }
             System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX **********************************");
             MatrixUtil.displayTempPath(path, memMat);
 
             int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
-            fullPath.addAll(path.subList(0,newStartIndex+1));
+
+            System.out.println("********************************** FOLLOWING THE ASTAR PATH **********************************");
+            MatrixUtil.displayTempPath(path.subList(0,newStartIndex+1),memMat,initialStart,end);
 
             int[] newStart = path.get(newStartIndex).position;
             start = newStart;
         }
-        return fullPath;
+
+    }
+
+    public static void repeatedAStarBackward(String[][] matrix,String[][] memMat, int[] start, int[] end){
+
+        System.out.println("START: " + start[0] + " : " + start[1]);
+        System.out.println("END: " + end[0] + " : " + end[1]);
+
+        int[] initialStart = start;
+
+        //Stopping condition for Repeated A*
+        while(start[0] != end[0] || start[1] != end[1]) {
+            List<Node> path = A_Star.findpath(memMat, end, start);
+
+            if(path == null ) {
+                System.out.println("********************************** NO POSSIBLE PATH **********************************");
+                System.exit(1);
+            }
+            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX IN BACKWARD **********************************");
+            MatrixUtil.displayTempPath(path, memMat);
+
+            path = MatrixUtil.invertPath(path);
+
+            int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
+
+            System.out.println("********************************** FOLLOWING THE ASTAR PATH **********************************");
+            MatrixUtil.displayTempPath(path.subList(0,newStartIndex+1),memMat,initialStart,end);
+
+            int[] newStart = path.get(newStartIndex).position;
+            start = newStart;
+        }
     }
 
     public static List<Node> findpath(String[][] matrix, int[] start, int[] end){
