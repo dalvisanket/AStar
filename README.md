@@ -6,5 +6,4 @@
 >>>*  -Drows=INTEGER_VALUE (eg. -Drows=5)
 >>>*  -Dcolumns=INTEGER_VALUE (eg. -Dcolumns=5)
 >>>*  -DaStarTypes=FORWARD,BACKWARD,ADAPTIVE  (eg. -DaStarTypes=FORWARD)
-
-
+>>>*  -DbreakTies=LESSER_GN,GREATER_GN  (eg. -DbreakTies=LESSER_GN)
