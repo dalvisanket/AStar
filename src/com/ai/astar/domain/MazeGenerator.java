@@ -19,10 +19,12 @@ public class MazeGenerator {
         for(int i = 0; i < maze.length; i++){
             for(int j = 0; j < maze[0].length; j++){
                 double prob = Math.random();
-                if(prob > 0.85) maze[i][j] = "#";
+                if(prob > 0.80) maze[i][j] = "#";
                 else maze[i][j] = ".";
             }
         }
+        maze[0][0] = ".";
+        maze[rows-1][columns-1] = ".";
 
     }
 
