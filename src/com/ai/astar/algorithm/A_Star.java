@@ -1,7 +1,10 @@
 package com.ai.astar.algorithm;
 
+import com.ai.astar.domain.BreakTie;
 import com.ai.astar.domain.Node;
 import com.ai.astar.util.Heap;
+import com.ai.astar.util.HeapGreaterGn;
+import com.ai.astar.util.HeapLesserGn;
 import com.ai.astar.util.MatrixUtil;
 
 import java.util.ArrayList;
@@ -14,7 +17,13 @@ public class A_Star {
 
     private static int totalClosedNodes = 0;
 
-    public static void repeatedAStar(String[][] matrix,String[][] memMat, int[] start, int[] end){
+    public static int totalFwdGreaterGnAstarClosedNodes = 0;
+
+    public static int totalFwdLesserGnAstarClosedNodes = 0;
+
+    public static int totalBwdAstarClosedNodes = 0;
+
+    public static void repeatedAStar(String[][] matrix, String[][] memMat, int[] start, int[] end, BreakTie breakTie){
 
         System.out.println("START: " + start[0] + " : " + start[1]);
         System.out.println("END: " + end[0] + " : " + end[1]);
@@ -23,10 +32,10 @@ public class A_Star {
 
         //Stopping condition for Repeated A*
         while(start[0] != end[0] || start[1] != end[1]) {
-            List<Node> path = A_Star.findpath(memMat, start, end);
+            List<Node> path = A_Star.findpath(memMat, start, end, breakTie);
             if(path == null ) {
                 System.out.println("********************************** NO POSSIBLE PATH **********************************");
-                System.exit(1);
+                break;
             }
             System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX **********************************");
             MatrixUtil.displayTempPath(path, memMat);
@@ -42,11 +51,17 @@ public class A_Star {
 
         System.out.println("Total Closed Nodes : " + totalClosedNodes);
         //Resetting the closed nodes count to zero
+        if(breakTie.equals(BreakTie.GREATER_GN)) {
+            totalFwdGreaterGnAstarClosedNodes += totalClosedNodes;
+        }
+        else{
+            totalFwdLesserGnAstarClosedNodes +=totalClosedNodes;
+        }
         totalClosedNodes = 0;
 
     }
 
-    public static void repeatedAStarBackward(String[][] matrix,String[][] memMat, int[] start, int[] end){
+    public static void backwardRepeatedAStar(String[][] matrix, String[][] memMat, int[] start, int[] end,BreakTie breakTie){
 
         System.out.println("START: " + start[0] + " : " + start[1]);
         System.out.println("END: " + end[0] + " : " + end[1]);
@@ -55,20 +70,20 @@ public class A_Star {
 
         //Stopping condition for Repeated A*
         while(start[0] != end[0] || start[1] != end[1]) {
-            List<Node> path = A_Star.findpath(memMat, end, start);
+            List<Node> path = A_Star.findpath(memMat, end, start,breakTie);
 
             if(path == null ) {
                 System.out.println("********************************** NO POSSIBLE PATH **********************************");
-                System.exit(1);
+                break;
             }
-            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX IN BACKWARD **********************************");
+            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX IN BACKWARD ASTAR **********************************");
             MatrixUtil.displayTempPath(path, memMat);
 
             path = MatrixUtil.invertPath(path);
 
             int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
 
-            System.out.println("********************************** FOLLOWING THE ASTAR PATH **********************************");
+            System.out.println("********************************** FOLLOWING THE BACKWARD ASTAR PATH **********************************");
             MatrixUtil.displayTempPath(path.subList(0,newStartIndex+1),memMat,initialStart,end);
 
             int[] newStart = path.get(newStartIndex).position;
@@ -77,10 +92,11 @@ public class A_Star {
 
         System.out.println("Total Closed Nodes : " + totalClosedNodes);
         //Resetting the closed nodes count to zero
+        totalBwdAstarClosedNodes +=totalClosedNodes;
         totalClosedNodes = 0;
     }
 
-    public static List<Node> findpath(String[][] matrix, int[] start, int[] end){
+    public static List<Node> findpath(String[][] matrix, int[] start, int[] end, BreakTie breakTie){
 
         //Compute Gn and Hn for the first position
         int gn = computeManhattan(start,start);
@@ -90,7 +106,14 @@ public class A_Star {
         List<Node> closedList = new ArrayList<>();
 
         //Initialize the Custom Heap Node Obj
-        Heap openList = new Heap();
+        Heap openList;
+        if(breakTie.equals(BreakTie.GREATER_GN)){
+            openList = new HeapGreaterGn();
+        }
+        else {
+            openList = new HeapLesserGn();
+        }
+
 
         //Offer the start position to Priority Queue
         openList.insert(new Node(start,
@@ -130,9 +153,9 @@ public class A_Star {
                     int localFn = localGn + localHn;
 
                     //Check if the node is on the open list and fn is greater than new fn
-                    if(checkIfNodeInList(new int[]{x,y},openList.nodeHeap)){
+                    if(checkIfNodeInList(new int[]{x,y},openList.getHeap())){
                         Node openNode = null;
-                        for(Node visited: openList.nodeHeap){
+                        for(Node visited: openList.getHeap()){
                             if(visited.position[0] == x && visited.position[1] == y) {
                                 openNode = visited;
                                 break;

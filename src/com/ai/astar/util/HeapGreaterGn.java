@@ -5,11 +5,11 @@ import com.ai.astar.domain.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HeapLessGn {
+public class HeapGreaterGn implements Heap{
 
-    public List<Node> nodeHeap;
+    private List<Node> nodeHeap;
 
-    public HeapLessGn(){
+    public HeapGreaterGn(){
         this.nodeHeap = new ArrayList<>();
     }
 
@@ -30,7 +30,7 @@ public class HeapLessGn {
                     nodeHeap.add(i, root);
                     nodeHeap.remove(rootIndex);
                     nodeHeap.add(rootIndex, leaf);
-                }else if (leaf.fn == root.fn && leaf.gn < root.gn) {
+                }else if (leaf.fn == root.fn && leaf.gn > root.gn) {
                     Node temp = leaf;
                     nodeHeap.remove(i);
                     nodeHeap.add(i, root);
@@ -57,6 +57,11 @@ public class HeapLessGn {
 
     public void sort(){
         insert(null);
+    }
+
+    @Override
+    public List<Node> getHeap() {
+        return nodeHeap;
     }
 
     public void displayHeapNode(){

@@ -2,6 +2,7 @@ package com.ai.astar.algorithm;
 
 import com.ai.astar.domain.Node;
 import com.ai.astar.util.Heap;
+import com.ai.astar.util.HeapGreaterGn;
 import com.ai.astar.util.MatrixUtil;
 
 import java.util.ArrayList;
@@ -11,9 +12,14 @@ import java.util.List;
 public class Adaptive_A_Star {
 
     private static int totalClosedNodes = 0;
+
+    public static int totalAdaptiveAstarClosedNodes = 0;
     public static void repeatedAStar(String[][] matrix, String[][] memMat, int[] start, int[] end){
 
         List<Node> closedListPev = new ArrayList<>();
+
+        System.out.println("START: " + start[0] + " : " + start[1]);
+        System.out.println("END: " + end[0] + " : " + end[1]);
 
         int[] initialStart = start;
 
@@ -23,14 +29,14 @@ public class Adaptive_A_Star {
 
             if(path == null ) {
                 System.out.println("********************************** NO POSSIBLE PATH **********************************");
-                System.exit(1);
+                break;
             }
-            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX **********************************");
+            System.out.println("********************************** ESTIMATED PATH IN MEMORY MARTIX - ADAPTIVE ASTAR **********************************");
             MatrixUtil.displayTempPath(path, memMat);
 
             int newStartIndex = MatrixUtil.followAStarPath(path,matrix,memMat);
 
-            System.out.println("********************************** FOLLOWING THE ASTAR PATH **********************************");
+            System.out.println("********************************** FOLLOWING THE ADAPTIVE ASTAR PATH **********************************");
             MatrixUtil.displayTempPath(path.subList(0,newStartIndex+1),memMat,initialStart,end);
 
             int[] newStart = path.get(newStartIndex).position;
@@ -38,7 +44,9 @@ public class Adaptive_A_Star {
         }
 
         System.out.println("Total Closed Nodes : " + totalClosedNodes);
+
         //Resetting the closed nodes count to zero
+        totalAdaptiveAstarClosedNodes +=totalClosedNodes;
         totalClosedNodes = 0;
     }
 
@@ -53,7 +61,7 @@ public class Adaptive_A_Star {
         List<Node> closedList = new ArrayList<>();
 
         //Initialize the Custom Heap Node Obj
-        Heap openList = new Heap();
+        Heap openList = new HeapGreaterGn();
 
         //Offer the start position to Priority Queue
         openList.insert(new Node(start,
@@ -102,9 +110,9 @@ public class Adaptive_A_Star {
                     int localFn = localGn + localHn;
 
                     //Check if the node is on the open list and fn is greater than new fn
-                    if(checkIfNodeInList(new int[]{x,y},openList.nodeHeap)){
+                    if(checkIfNodeInList(new int[]{x,y},openList.getHeap())){
                         Node openNode = null;
-                        for(Node visited: openList.nodeHeap){
+                        for(Node visited: openList.getHeap()){
                             if(visited.position[0] == x && visited.position[1] == y) {
                                 openNode = visited;
                                 break;
